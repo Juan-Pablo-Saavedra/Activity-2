@@ -1,169 +1,198 @@
 // Estado de la calculadora
-let current = "0";
-let previous = "";
-let operation = null;
-let justComputed = false;
+const state = {
+  current: "0",
+  previous: null,
+  operator: null,
+  justCalculated: false
+};
 
-const currentEl = document.getElementById("currentOperand");
-const previousEl = document.getElementById("previousOperand");
-const container = document.querySelector(".keys");
+// Elementos
+const outputEl = document.getElementById("output");
+const historyEl = document.getElementById("history");
+const keys = document.querySelector(".keys");
 
-function updateDisplay() {
-  currentEl.textContent = formatDisplay(current);
-  previousEl.textContent = previous && operation ? `${formatDisplay(previous)} ${operation}` : "";
-}
+// Utilidades
+const nf = new Intl.NumberFormat("es-CO");
 
-function formatDisplay(value) {
-  if (value === "Error") return "Error";
-  if (value === "" || value === "-") return value || "0";
-  const num = Number(value);
-  if (!Number.isFinite(num)) return "Error";
-  const parts = value.split(".");
-  const intPart = parts[0];
-  const decPart = parts[1];
-
-  const intFormatted = Number(intPart).toLocaleString("es-CO");
+function formatNumber(str) {
+  if (str === "Error") return str;
+  if (!str || str === ".") return "0.";
+  const [intPart, decPart] = str.split(".");
+  const intFormatted = nf.format(parseInt(intPart || "0", 10));
   return decPart !== undefined ? `${intFormatted}.${decPart}` : intFormatted;
 }
 
-function clearAll() {
-  current = "0";
-  previous = "";
-  operation = null;
-  justComputed = false;
-  updateDisplay();
+function sanitize(str) {
+  // Limpia ceros a la izquierda adecuadamente
+  if (str.includes(".")) {
+    // Mantener los decimales tal cual para no perder precisión visual
+    return str.replace(/^(-?)0+(?=\d)/, "$1");
+  }
+  return String(parseFloat(str)).replace(/NaN/, "0");
 }
 
-function deleteOne() {
-  if (justComputed) {
-    // Si recién calculamos, borrar vuelve a 0
-    current = "0";
-    justComputed = false;
-    updateDisplay();
-    return;
-  }
-  if (current.length <= 1 || (current.length === 2 && current.startsWith("-"))) {
-    current = "0";
-  } else {
-    current = current.slice(0, -1);
-  }
-  updateDisplay();
+function updateDisplay() {
+  outputEl.textContent = formatNumber(state.current);
+  const op = state.operator || "";
+  const prev = state.previous !== null ? formatNumber(state.previous) : "";
+  historyEl.textContent = prev && op ? `${prev} ${op}` : "";
 }
 
-function appendNumber(num) {
-  if (justComputed) {
-    current = num;
-    justComputed = false;
-    updateDisplay();
-    return;
-  }
-  if (current === "0") {
-    current = num;
-  } else {
-    current += num;
-  }
-  updateDisplay();
-}
-
-function appendDecimal() {
-  if (justComputed) {
-    current = "0.";
-    justComputed = false;
-    updateDisplay();
-    return;
-  }
-  if (!current.includes(".")) {
-    current += current === "" ? "0." : ".";
-    updateDisplay();
-  }
-}
-
-function chooseOperation(op) {
-  // Permite cambiar de operación antes de escribir el siguiente número
-  if (previous && !justComputed && current === "0") {
-    operation = op;
-    updateDisplay();
-    return;
-  }
-
-  if (operation && previous !== "" && current !== "") {
-    compute();
-  }
-
-  operation = op;
-  previous = current;
-  current = "0";
-  justComputed = false;
-  updateDisplay();
-}
-
-function compute() {
-  const a = parseFloat(previous);
-  const b = parseFloat(current);
-  if (isNaN(a) || isNaN(b)) return;
+// Operaciones básicas
+function compute(aStr, op, bStr) {
+  const a = parseFloat(aStr);
+  const b = parseFloat(bStr);
+  if (!isFinite(a) || !isFinite(b)) return "0";
 
   let result;
-  switch (operation) {
+  switch (op) {
     case "+": result = a + b; break;
     case "−": result = a - b; break;
     case "×": result = a * b; break;
-    case "÷":
-      if (b === 0) {
-        current = "Error";
-        previous = "";
-        operation = null;
-        justComputed = true;
-        updateDisplay();
-        return;
-      }
-      result = a / b; break;
-    case "%":
-      // Módulo matemático
-      result = a % b; break;
-    default: return;
+    case "÷": result = b === 0 ? NaN : a / b; break;
+    default: return bStr;
   }
-
-  // Redondeo para evitar errores de flotantes
-  result = Math.round(result * 1e12) / 1e12;
-
-  current = String(result);
-  previous = "";
-  operation = null;
-  justComputed = true;
-  updateDisplay();
+  if (!isFinite(result)) return "Error";
+  // Limita ruido flotante
+  const asStr = String(+parseFloat(result.toFixed(12)));
+  return asStr;
 }
 
-// Manejo de clicks
-container.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
+// Acciones
+function inputNumber(digit) {
+  if (state.justCalculated) {
+    state.current = digit;
+    state.justCalculated = false;
+  } else if (state.current === "0") {
+    state.current = digit;
+  } else {
+    state.current += digit;
+  }
+  state.current = sanitize(state.current);
+}
 
-  const action = btn.dataset.action;
-  if (action === "number") return appendNumber(btn.dataset.num);
-  if (action === "decimal") return appendDecimal();
-  if (action === "operation") return chooseOperation(btn.dataset.op);
-  if (action === "equals") return compute();
-  if (action === "clear") return clearAll();
-  if (action === "delete") return deleteOne();
+function inputDecimal() {
+  if (state.justCalculated) {
+    state.current = "0.";
+    state.justCalculated = false;
+  } else if (!state.current.includes(".")) {
+    state.current += ".";
+  }
+}
+
+function setOperator(op) {
+  if (state.operator && state.previous !== null && !state.justCalculated) {
+    // Encadenar operaciones al estilo calculadora
+    state.previous = compute(state.previous, state.operator, state.current);
+    state.current = "0";
+  } else if (state.previous === null) {
+    state.previous = state.current;
+    state.current = "0";
+  }
+  state.operator = op;
+  state.justCalculated = false;
+}
+
+function equals() {
+  if (state.operator && state.previous !== null) {
+    const result = compute(state.previous, state.operator, state.current);
+    state.current = result;
+    state.previous = null;
+    state.operator = null;
+    state.justCalculated = true;
+  }
+}
+
+function clearAll() {
+  state.current = "0";
+  state.previous = null;
+  state.operator = null;
+  state.justCalculated = false;
+}
+
+function deleteOne() {
+  if (state.justCalculated) {
+    // Tras un cálculo, DEL actúa como clear parcial
+    state.justCalculated = false;
+    state.current = "0";
+    return;
+  }
+  if (state.current.length <= 1 || (state.current.length === 2 && state.current.startsWith("-"))) {
+    state.current = "0";
+  } else {
+    state.current = state.current.slice(0, -1);
+  }
+}
+
+function invertSign() {
+  if (state.current === "0") return;
+  state.current = state.current.startsWith("-") ? state.current.slice(1) : "-" + state.current;
+}
+
+function percent() {
+  const n = parseFloat(state.current);
+  if (!isFinite(n)) return;
+  state.current = String(n / 100);
+}
+
+// Eventos UI
+keys.addEventListener("pointermove", (e) => {
+  if (!(e.target instanceof HTMLElement)) return;
+  if (!e.target.classList.contains("btn")) return;
+  const rect = e.target.getBoundingClientRect();
+  e.target.style.setProperty("--x", `${e.clientX - rect.left}px`);
+  e.target.style.setProperty("--y", `${e.clientY - rect.top}px`);
+});
+
+keys.addEventListener("click", (e) => {
+  const target = e.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const num = target.getAttribute("data-number");
+  const op = target.getAttribute("data-operator");
+  const action = target.getAttribute("data-action");
+
+  if (num !== null) {
+    inputNumber(num);
+  } else if (op !== null) {
+    if (op === "%") percent();
+    else setOperator(op);
+  } else if (action) {
+    switch (action) {
+      case "decimal": inputDecimal(); break;
+      case "equals": equals(); break;
+      case "clear": clearAll(); break;
+      case "delete": deleteOne(); break;
+      case "invert": invertSign(); break;
+    }
+  }
+  updateDisplay();
 });
 
 // Soporte de teclado
 window.addEventListener("keydown", (e) => {
-  const key = e.key;
+  const { key } = e;
 
-  if (/\d/.test(key)) return appendNumber(key);
-  if (key === "." || key === ",") return appendDecimal();
-
-  if (key === "+" ) return chooseOperation("+");
-  if (key === "-" ) return chooseOperation("−");
-  if (key === "*" ) return chooseOperation("×");
-  if (key === "/")  return chooseOperation("÷");
-  if (key === "%")  return chooseOperation("%");
-
-  if (key === "Enter" || key === "=") return compute();
-  if (key === "Backspace") return deleteOne();
-  if (key === "Escape") return clearAll();
+  if ((key >= "0" && key <= "9")) {
+    inputNumber(key);
+  } else if (key === "." || key === ",") {
+    inputDecimal();
+  } else if (key === "+" || key === "-" || key === "*" || key === "/") {
+    const map = { "+": "+", "-": "−", "*": "×", "/": "÷" };
+    setOperator(map[key]);
+    e.preventDefault();
+  } else if (key === "Enter" || key === "=") {
+    equals();
+    e.preventDefault();
+  } else if (key === "Backspace") {
+    deleteOne();
+  } else if (key === "Escape") {
+    clearAll();
+  } else if (key === "%") {
+    percent();
+  }
+  updateDisplay();
 });
 
-// Inicializa
+// Init
 updateDisplay();

@@ -2,46 +2,53 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calculadora</title>
-  <link rel="stylesheet" href="Css/styles.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora Moderna</title>
+
+  <link rel="stylesheet" href="Css/styles.css" />
 </head>
 <body>
-  <main class="calculator" aria-label="Calculadora básica">
-    <section class="display" aria-live="polite">
-      <div class="previous" id="previousOperand"></div>
-      <div class="current" id="currentOperand">0</div>
-    </section>
+  <main class="page">
+    <section class="calculator" role="application" aria-label="Calculadora">
+      <header class="display" aria-live="polite" aria-atomic="true">
+        <div class="history" id="history" aria-hidden="true"></div>
+        <div class="output" id="output">0</div>
+      </header>
 
-    <section class="keys" role="group" aria-label="Teclas de la calculadora">
-      <!-- Fila de control -->
-      <button class="key key-func" data-action="clear" aria-label="Limpiar">C</button>
-      <button class="key key-func" data-action="delete" aria-label="Borrar">DEL</button>
-      <button class="key key-op" data-action="operation" data-op="%" aria-label="Módulo">%</button>
-      <button class="key key-op" data-action="operation" data-op="÷" aria-label="Dividir">÷</button>
+      <div class="keys" role="group" aria-label="Teclas de la calculadora">
+        <!-- Fila 1 -->
+        <button class="btn btn-muted" data-action="clear" aria-label="Borrar todo">AC</button>
+        <button class="btn btn-muted" data-action="delete" aria-label="Borrar último">DEL</button>
+        <button class="btn btn-operator" data-operator="%" aria-label="Porcentaje">%</button>
+        <button class="btn btn-operator" data-operator="÷" aria-label="Dividir">÷</button>
 
-      <!-- Números y operaciones -->
-      <button class="key" data-action="number" data-num="7">7</button>
-      <button class="key" data-action="number" data-num="8">8</button>
-      <button class="key" data-action="number" data-num="9">9</button>
-      <button class="key key-op" data-action="operation" data-op="×" aria-label="Multiplicar">×</button>
+        <!-- Fila 2 -->
+        <button class="btn" data-number="7" aria-label="Siete">7</button>
+        <button class="btn" data-number="8" aria-label="Ocho">8</button>
+        <button class="btn" data-number="9" aria-label="Nueve">9</button>
+        <button class="btn btn-operator" data-operator="×" aria-label="Multiplicar">×</button>
 
-      <button class="key" data-action="number" data-num="4">4</button>
-      <button class="key" data-action="number" data-num="5">5</button>
-      <button class="key" data-action="number" data-num="6">6</button>
-      <button class="key key-op" data-action="operation" data-op="−" aria-label="Restar">−</button>
+        <!-- Fila 3 -->
+        <button class="btn" data-number="4" aria-label="Cuatro">4</button>
+        <button class="btn" data-number="5" aria-label="Cinco">5</button>
+        <button class="btn" data-number="6" aria-label="Seis">6</button>
+        <button class="btn btn-operator" data-operator="−" aria-label="Restar">−</button>
 
-      <button class="key" data-action="number" data-num="1">1</button>
-      <button class="key" data-action="number" data-num="2">2</button>
-      <button class="key" data-action="number" data-num="3">3</button>
-      <button class="key key-op" data-action="operation" data-op="+" aria-label="Sumar">+</button>
+        <!-- Fila 4 -->
+        <button class="btn" data-number="1" aria-label="Uno">1</button>
+        <button class="btn" data-number="2" aria-label="Dos">2</button>
+        <button class="btn" data-number="3" aria-label="Tres">3</button>
+        <button class="btn btn-operator" data-operator="+" aria-label="Sumar">+</button>
 
-      <button class="key" data-action="number" data-num="0" style="grid-column: span 2;">0</button>
-      <button class="key" data-action="decimal">.</button>
-      <button class="key key-equals" data-action="equals" aria-label="Igual">=</button>
+        <!-- Fila 5 -->
+        <button class="btn btn-muted" data-action="invert" aria-label="Cambiar signo">±</button>
+        <button class="btn" data-number="0" aria-label="Cero">0</button>
+        <button class="btn" data-action="decimal" aria-label="Decimal">.</button>
+        <button class="btn btn-accent" data-action="equals" aria-label="Igual">=</button>
+      </div>
     </section>
   </main>
 
-  <script src="Js/app.js"></script>
+  <script defer src="Js/app.js"></script>
 </body>
 </html>
