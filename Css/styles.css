@@ -1,0 +1,96 @@
+:root{
+  --bg: #0f1220;
+  --panel: #151a2e;
+  --accent: #5b7cfa;
+  --accent-strong: #3556ff;
+  --text: #e9ecf1;
+  --muted: #a3acc3;
+  --danger: #ff6b6b;
+}
+
+* { box-sizing: border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background: radial-gradient(1000px 600px at 70% 20%, #1a2144 0%, #0f1220 60%, #0b0e1a 100%);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+}
+
+.calculator{
+  width: min(92vw, 380px);
+  background: var(--panel);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.04);
+  overflow: hidden;
+}
+
+.display{
+  padding: 18px 16px;
+  min-height: 100px;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+}
+
+.display .previous{
+  color: var(--muted);
+  font-size: 0.95rem;
+  height: 1.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.display .current{
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1.2;
+  word-break: break-all;
+  text-align: right;
+}
+
+.keys{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 14px;
+  background: rgba(0,0,0,.08);
+}
+
+.key{
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  height: 56px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: transform .04s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: 0 2px 0 rgba(0,0,0,.25);
+}
+
+.key:hover{ background: rgba(255,255,255,.09); }
+.key:active{ transform: translateY(1px); }
+
+.key-op{ background: rgba(91,124,250,.18); }
+.key-op:hover{ background: rgba(91,124,250,.28); }
+
+.key-func{ background: rgba(255,107,107,.18); }
+.key-func:hover{ background: rgba(255,107,107,.28); }
+
+.key-equals{
+  background: var(--accent);
+  box-shadow: 0 2px 0 rgba(0,0,0,.25), inset 0 -8px 20px rgba(0,0,0,.2);
+}
+.key-equals:hover{ background: var(--accent-strong); }
