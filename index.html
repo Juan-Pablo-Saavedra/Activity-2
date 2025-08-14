@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora</title>
+  <link rel="stylesheet" href="Css/styles.css"/>
+</head>
+<body>
+  <main class="calculator" aria-label="Calculadora básica">
+    <section class="display" aria-live="polite">
+      <div class="previous" id="previousOperand"></div>
+      <div class="current" id="currentOperand">0</div>
+    </section>
+
+    <section class="keys" role="group" aria-label="Teclas de la calculadora">
+      <!-- Fila de control -->
+      <button class="key key-func" data-action="clear" aria-label="Limpiar">C</button>
+      <button class="key key-func" data-action="delete" aria-label="Borrar">DEL</button>
+      <button class="key key-op" data-action="operation" data-op="%" aria-label="Módulo">%</button>
+      <button class="key key-op" data-action="operation" data-op="÷" aria-label="Dividir">÷</button>
+
+      <!-- Números y operaciones -->
+      <button class="key" data-action="number" data-num="7">7</button>
+      <button class="key" data-action="number" data-num="8">8</button>
+      <button class="key" data-action="number" data-num="9">9</button>
+      <button class="key key-op" data-action="operation" data-op="×" aria-label="Multiplicar">×</button>
+
+      <button class="key" data-action="number" data-num="4">4</button>
+      <button class="key" data-action="number" data-num="5">5</button>
+      <button class="key" data-action="number" data-num="6">6</button>
+      <button class="key key-op" data-action="operation" data-op="−" aria-label="Restar">−</button>
+
+      <button class="key" data-action="number" data-num="1">1</button>
+      <button class="key" data-action="number" data-num="2">2</button>
+      <button class="key" data-action="number" data-num="3">3</button>
+      <button class="key key-op" data-action="operation" data-op="+" aria-label="Sumar">+</button>
+
+      <button class="key" data-action="number" data-num="0" style="grid-column: span 2;">0</button>
+      <button class="key" data-action="decimal">.</button>
+      <button class="key key-equals" data-action="equals" aria-label="Igual">=</button>
+    </section>
+  </main>
+
+  <script src="Js/app.js"></script>
+</body>
+</html>
